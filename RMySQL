@@ -1,4 +1,4 @@
-he basic process is described here, but there are several hints, So I will describe the whole solution (please change the R version and paths if needed):
+The basic process is described here, but there are several hints, So I will describe the whole solution (please change the R version and paths if needed):
 
 Install latest RTools from here
 install MySQL or header and library files of mysql
