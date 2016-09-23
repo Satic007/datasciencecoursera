@@ -12,10 +12,9 @@ rankhospital <- function (state, outcome, num = "best") {
         
         #Creating a data frame
         hospdata <- read.csv("outcome-of-care-measures.csv")
-        states <- levels(hospdata$State)
+        states <- as.character(levels(hospdata$State))
         
-        outcome <- toupper(outcome)
-        
+
         if (!state %in% states) { stop("Invalid State")}
         if (!outcome %in% outcomes) { stop("Invalid outcome")}
         
@@ -26,18 +25,32 @@ rankhospital <- function (state, outcome, num = "best") {
         hospdata_st[,2] <- as.numeric(as.character(hospdata_st[,2]))
         hospdata_st <- na.omit(hospdata_st)
         numrows <- nrow(hospdata_st)
+
+        names(hospdata_st) <- c("name","death")
+
+        #Sorting unique death values        
+        #rnk <- sort(unique(hospdata_st$death))
+        
+        #Sorting death values        
+        rnk <- sort(hospdata_st$death)
+
+        highrnk <- as.numeric(rnk[length(rnk)])
+
+
         if (num=="best"){
-                idx <- "1"
+                idx <- c("1")
         }else if (num == "worst"){
-                idx <- numrows
-        }else {idx <- num}
+                idx <- highrnk
+        }else {idx <- rnk[as.numeric(num)]}
         
         idx <- as.numeric(idx)
         #print(idx)
         
-        names(hospdata_st) <- c("name","death")
-        hospdata_ord <- order(hospdata_st$death)
-        #print(hospdata_ord[idx])
-        hosp <- hospdata_st[hospdata_ord[idx],]$name
-        return(as.character(sort(hosp)[1]))
+        
+        hospdata_ord <- hospdata_st[hospdata_st$death == idx,]
+        #hospdata_ord <- order(hospdata_st$death, -hospdata_st$name)
+        print(hospdata_ord)
+        #hosp <- sort(hospdata_ord$name, decreasing = TRUE)
+        #return(as.character(hosp[1]))
+        ## USE traceback in console to find the location of error
 }
