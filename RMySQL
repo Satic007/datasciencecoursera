@@ -1,6 +1,6 @@
 The basic process is described here, but there are several hints, So I will describe the whole solution (please change the R version and paths if needed):
 
-Install latest RTools from here
+Install latest RTools 
 install MySQL or header and library files of mysql
 create or edit file C:\Program Files\R\R-2.12.1\etc\Renviron.site and add line like MYSQL_HOME=C:/mysql (path to your mysql files)
 copy libmysql.lib from mysql/lib to mysql/lib/opt to meet dependencies.
