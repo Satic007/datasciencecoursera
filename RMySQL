@@ -1,0 +1,11 @@
+he basic process is described here, but there are several hints, So I will describe the whole solution (please change the R version and paths if needed):
+
+Install latest RTools from here
+install MySQL or header and library files of mysql
+create or edit file C:\Program Files\R\R-2.12.1\etc\Renviron.site and add line like MYSQL_HOME=C:/mysql (path to your mysql files)
+copy libmysql.lib from mysql/lib to mysql/lib/opt to meet dependencies.
+copy libmysql.dll to C:\Program Files\R\R-2.12.1\bin or to windows/system32 directory.
+run install.packages('RMySQL',type='source') and wait while compilation will end.
+This worked for me on Windows 7 64 bit, so there should be no problems with 32 bit versions
+
+Initialy posted here (similar question).
