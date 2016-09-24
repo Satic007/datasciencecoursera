@@ -94,4 +94,18 @@ Cleaning <- function() {
   
   rest_zip <- xpathSApply(rootNode,"/response//row[zipcode=21231]", xmlValue) # Filters the record and gives all values of the node
   xpathSApply(rootNode[[1]],"//zipcode", xmlValue) # Gives al values of xipcode element
+  #=================================================
+  ucsdb <- dbConnect(MySQL(), user="genome", host = "genome-mysql.cse.ucsc.edu") # connecing to the server
+  result <- dbGetQuery(ucsdb,"show databases;"); dbDisconnect(ucsdb) # Always close connection once work is done
+  hg19 <- dbConnect(MySQL(), user="genome", db="hg19", host = "genome-mysql.cse.ucsc.edu") # connecting to specfic database
+  allTables <- dbListTables(hg19)
+  length(allTables)
+  allTables[1:4] # fetching only first 4 tables
+  dbListFields(hg19,"affyU133Plus2") # Listing the fields of table affyU13Plus2
+  dbGetQuery(hg19,"SELECT COUNT(*) FROM affyU133Plus2")
+  affydata <- dbReadTable(hg19,"affyU133Plus2")
+  head(affydata)
+  qry <- dbSendQuery(hg19,"select * from affyU133Plus2 where mismatches between 1 and 3")
+  affmiss <- fetch(qry);quantile(affmiss$misMatches)
+  affyMissSmall <- fetch(qry, n=10); dbClearResult(qry) # Always clear the result 
 }
