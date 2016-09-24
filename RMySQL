@@ -1,10 +1,13 @@
 The basic process is described here, but there are several hints, So I will describe the whole solution (please change the R version and paths if needed):
 
+Install R
 Install latest RTools 
-Install MySQL or header and library files of mysql
-Install Cygwin (C:\cygwin64\bin)  and RTools (C:RTools\bin)  to the PATH of system variable under environment variables 
+Install MySQL (Community server)
+Install Cygwin 
+Add cygwin (C:\cygwin64\bin)and RTools (C:RTools\bin)  to the PATH of system variable under environment variables 
+Create a new environment variable MYSQL_HOME with value C:/Program Files/MySQL/MySQL Server 5.7/
 copy libmysql.dll to C:\Program Files\MySQL\MySQL Server 5.7\bin from C:\Program Files\MySQL\MySQL Server 5.7\lib
 copy libmysql.dll to C:\Program Files\R\R-2.12.1\bin (Ooptional)
 run install.packages('RMySQL',type='source') and wait while compilation will end.
-
+check by running libraty(RMySQL)
 
