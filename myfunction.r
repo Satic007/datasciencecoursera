@@ -94,7 +94,7 @@ Cleaning <- function() {
   
   rest_zip <- xpathSApply(rootNode,"/response//row[zipcode=21231]", xmlValue) # Filters the record and gives all values of the node
   xpathSApply(rootNode[[1]],"//zipcode", xmlValue) # Gives al values of xipcode element
-  #=================================================
+  #=================================================MySQL============
   ucsdb <- dbConnect(MySQL(), user="genome", host = "genome-mysql.cse.ucsc.edu") # connecing to the server
   result <- dbGetQuery(ucsdb,"show databases;"); dbDisconnect(ucsdb) # Always close connection once work is done
   hg19 <- dbConnect(MySQL(), user="genome", db="hg19", host = "genome-mysql.cse.ucsc.edu") # connecting to specfic database
@@ -108,4 +108,93 @@ Cleaning <- function() {
   qry <- dbSendQuery(hg19,"select * from affyU133Plus2 where mismatches between 1 and 3")
   affmiss <- fetch(qry);quantile(affmiss$misMatches)
   affyMissSmall <- fetch(qry, n=10); dbClearResult(qry) # Always clear the result 
+  
+  #=======================HDF5=================
+  source("http://bioconductor.org/biocLite.R")
+  biocLite("rhdf5") # 
+  library(rhdf5) # This will install packages from Bioconductor, used for genomics , but has good BigData packages
+  created <- h5createFile("example.h5")
+  created
+  will return [1] TRUE
+  
+  #creating groups 
+created <- h5createGroup("example.h5", "boo")
+created <- h5createGroup("example.h5", "foo")
+created <- h5createGroup("example.h5", "baa")
+created <- h5createGroup("example.h5", "foo/foobaa")
+h5ls("exmple.h5") # Lists the groups created
+
+#creating data and writing
+> A <- matrix(1:10, nr=5, nc=2)
+> h5write(A,"example.h5","foo/A")
+> B <- array(seq(0.1,2.0, by=0.1), dim = c(5,2,2))
+> attr(B,"scale") <- "liter"
+> h5write(B, "example.h5", "foo/foobaa/B")
+> h5ls("example.h5")
+
+#writing a data frame to h5 file
+df <- data.frame(1L:5L,seq(0.1,length.out = 5), c("ab","cde","abdc","a","s"), stringsAsFactors = FALSE)
+ h5write(df,"example.h5","df")
+> h5ls("example.h5")
+
+#Reading
+> readA <- h5read("example.h5","foo/A")
+> readA
+     [,1] [,2]
+[1,]    1    6
+[2,]    2    7
+[3,]    3    8
+[4,]    4    9
+[5,]    5   10
+#writing chunks
+> h5write(c(12,13,14),"example.h5", "foo/A", index = list(1:3,1)) # writing to first 3 defined as index and to firs column
+> h5read("example.h5","foo/A")
+
+     [,1] [,2]
+[1,]   12    6
+[2,]   13    7
+[3,]   14    8
+[4,]    4    9
+[5,]    5   10
+
+#================Reading from Web
+> con <- url("https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en")
+> htmlcode <- readLines(con)
+close(con)
+htmlcode # will return html code
+
+install.packages("XML") # To read XML data
+> library(XML)
+> url <- "https://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en"
+> html <- htmlTreeParse(url, useInternalNodes = T)
+
+ install.packages("httr") # for better reading the web
+ > library(httr)
+> html2 <- GET(url)
+> content2 <- content(html2, as = "text")
+> parsedHTML <- htmlParse(content2,asText = TRUE)
+> xpathSApply(parsedHTML,"//title", xmlValue)
+
+#Accessing webpages which needs authentication
+> pg1 <- GET("http://httpbin.org/basic-auth/user/passwd")
+> pg1
+Response [http://httpbin.org/basic-auth/user/passwd]
+  Date: 2016-09-24 17:37
+  Status: 401
+  Content-Type: <unknown>
+<EMPTY BODY>
+#Add credentials this time
+> pg2 <- GET("http://httpbin.org/basic-auth/user/passwd", authenticate("user","passwd"))
+> pg2
+Response [http://httpbin.org/basic-auth/user/passwd]
+  Date: 2016-09-24 17:37
+  Status: 200
+  Content-Type: application/json
+  Size: 47 B
+{
+  "authenticated": true, 
+  "user": "user"
+}
+
+
 }
