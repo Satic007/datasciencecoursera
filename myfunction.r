@@ -76,7 +76,7 @@ Cleaning <- function() {
   # Below one gives correct way, remaining else gives only values
   DT[,mean(pwgtp15),by=SEX]
   mean(DT[DT$SEX==1,]$pwgtp15); mean(DT[DT$SEX==2,]$pwgtp15)
-  #============================= 
+  #============================= Reading XML file
   doc <- xmlTreeParse("restaurants.xml" , useInternalNodes = TRUE)
   class(doc)
   class(rootNode)
@@ -94,7 +94,9 @@ Cleaning <- function() {
   
   rest_zip <- xpathSApply(rootNode,"/response//row[zipcode=21231]", xmlValue) # Filters the record and gives all values of the node
   xpathSApply(rootNode[[1]],"//zipcode", xmlValue) # Gives al values of xipcode element
-  #=================================================MySQL============
+	
+  #=================================================MySQL========================================
+  
   ucsdb <- dbConnect(MySQL(), user="genome", host = "genome-mysql.cse.ucsc.edu") # connecing to the server
   result <- dbGetQuery(ucsdb,"show databases;"); dbDisconnect(ucsdb) # Always close connection once work is done
   hg19 <- dbConnect(MySQL(), user="genome", db="hg19", host = "genome-mysql.cse.ucsc.edu") # connecting to specfic database
@@ -195,6 +197,49 @@ Response [http://httpbin.org/basic-auth/user/passwd]
   "authenticated": true, 
   "user": "user"
 }
+# Reading from API
+	#==============Twitter App 
+	#http://www.LearnDS.com
 
+	#Consumer Key (API Key) qgIRwEodVwqQRNfBSZyHoVTy8
+	#Consumer Secret (API Secret) WOiUNh7NXLZfOQzS648yh5aVJOUv1VyJaTYjDudcTfVctlSnG8 
+
+	#Request token URL https://api.twitter.com/oauth/request_token
+	#Authorize URL https://api.twitter.com/oauth/authorize
+	#Access token URL https://api.twitter.com/oauth/access_token 
+
+	#Access Token 95123719-oct1aFo2SVIurG1kOv3GtISJxO1N1mkSo4HAXoM5A
+	#Access Token Secret gw2LUis39SMidG7BpuxvNUDisW6vnnJcPbM5XJxxPTpKc 
+	#==============Accessing Twitteer
+	> myapp <- oauth_app("twitter", key ="qgIRwEodVwqQRNfBSZyHoVTy8", secret = "WOiUNh7NXLZfOQzS648yh5aVJOUv1VyJaTYjDudcTfVctlSnG8")
+	> sig <- sign_oauth1.0(myapp, "95123719-oct1aFo2SVIurG1kOv3GtISJxO1N1mkSo4HAXoM5A", "gw2LUis39SMidG7BpuxvNUDisW6vnnJcPbM5XJxxPTpKc")
+	> homeTL = GET("https://api.twitter.com/1.1/statuses/home_timeline.json",sig)
+	> json1 = content(homeTL)
+	> json2 = jsonlite::fromJSON(toJson(json1))
+
+	#==============Accessing Github
+	myapp <- oauth_app("github", "8f4dfc041e89690553a7","4efca62ba6850c444824d9de200db1383e257ef4") # pass key(clientid) and secret
+	github_token <- oauth2.0_token(oauth_endpoints("github"), myapp)
+	gtoken <- config(token = github_token)
+	req <- GET("https://api.github.com/users/jtleek/repos", gtoken) # accessing specific repo
+	stop_for_status(req)
+	content(req)
+	
+	# When using sqldf package, detach RMySQL package
+	detach("package:RMySQL", unload = TRUE)
+	install.packages("sqldf")
+	library(sqldf)
+	acs <- read.csv("pid.csv", header = TRUE, sep = ",")
+	sqldf("select pwgtp1 from acs where AGEP < 50")
+	sqldf("select distinct AGEP from acs")
+	
+	#Reading from HTML
+	doc <- url("http://biostat.jhsph.edu/~jleek/contact.html")
+	lns <- readLines(doc)
+	nchar(lns[10]) # reading number of characters 
+	
+	#Reading Fixed width file
+	ff <- read.fwf(file = url("http://www.cpc.ncep.noaa.gov/data/indices/wksst8110.for"),skip=4,
++                widths=c(12, 7, 4, 9, 4, 9, 4, 9, 4))
 
 }
