@@ -241,5 +241,58 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	#Reading Fixed width file
 	ff <- read.fwf(file = url("http://www.cpc.ncep.noaa.gov/data/indices/wksst8110.for"),skip=4,
 +                widths=c(12, 7, 4, 9, 4, 9, 4, 9, 4))
+	
+	#====================Summarizing the data==================
+	> fileurl <- "https://data.baltimorecity.gov/api/views/k5ry-ef3g/rows.csv?accessType=DOWNLOAD"
+	> download.file(fileurl, destfile = "restaurants.csv")
+	> restData <- read.csv("restaurants.csv")
+	> summary(restData) # summarizes the data
+	
+	> str(restData) # Gives information of data frame
+	
+	> quantile(restData$councilDistrict)  # Provides quantile of data
+	> quantile(restData$councilDistrict, probs = c(0.5,.87)) # Filter the probability of probability
+	
+	> table(restData$zipCode, useNA = "ifany") # creating a table and using argument to show NA ; 'arg' should be one of “no”, “ifany”, “always”
+	> table(restData$councilDistrict, restData$zipCode) # creating two dimensional table 
+	
+	> sum(is.na(restData$councilDistrict)) # sum of missing NA values
+	> any(is.na(restData$councilDistrict)) # Checks if ANY values is NA
+	> all(restData$zipCode>0) # searches a column for specific critieria in whole data frame
+	
+	> colSums(is.na(restData)) # Searches all the columns in df for NA and summarizes each column
+	> all(colSums(is.na(restData))==0) # Applying the above in a condition, returns TRUE or FALSE
+	
+	> table(restData$zipCode==21212) # Finding number of records with specific condition
+	> table(restData$zipCode %in% c("21212")) # Using IN operator
+	> table(restData$zipCode %in% c("21212","21213")) # multiple condition
+	FALSE  TRUE 
+ 	1268    59 
+	
+	> restData[restData$zipCode %in% c("21212"),] # Filtering the data frame
+	
+	> data("UCBAdmissions")
+	> DF <- as.data.frame(UCBAdmissions) # creating a data frame from existing data set
+	> summary(DF)
+	> xtabs(Freq ~ Gender + Admit, data=DF) # summarize data between cross tabs; creates two dimension table
+	
+	> xt <- xtabs(Freq ~ Gender + Dept + Admit, data=DF) #using multiple cross reference
+	> ftable(xt) # ftable used to organize the jumbled up data
+	
+	> xt <- xtabs(Freq ~., data=DF) #using cross reference of one column with rest
+	
+	> warpbreaks$replicate <- rep(1:9, len=54) # replicate the data set
+	> xt1 = xtabs(breaks ~.,data = warpbreaks)
+	> ftable(xt1)
+	
+	#Finding the sie of the data
+	
+	> fake = rnorm(1e5)
+	> object.size(fake)
+	800040 bytes
+	> print(object.size(fake), units = "Mb")
+	0.8 Mb
+	
+	
 
 }
