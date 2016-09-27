@@ -418,5 +418,44 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 				       
 	chicago <- mutate(chicago, year=as.POSIXlt(date)$year + 1900)
 	years <- group_by(chicago, year)
-	summarise(years, pm25= mean(pm25, na.rm = TRUE), o3=max(o3tmean2), no2=median(no2tmean2))				       
+	summarise(years, pm25= mean(pm25, na.rm = TRUE), o3=max(o3tmean2), no2=median(no2tmean2))	
+				       
+	#=================AGGREGATING DATA ECOLAB PROD FILE ===================================================
+	> prd <- read.csv(SLS_STG_PRODS_Missing_In_Files_09272016.csv)
+	> prd <- rename(prd, SRC = SOURCE_SYSTEM_NAME, CNTRY = COUNTRY_CODE, PROD = ï..Product_code)				       
+	> DT <- data.table(prd)
+	> table(DT$CNTRY) # table will gives the count of records based on each column value as list				       
+	#Different ways to retrieve number of records for each country like group by in SQL
+	> data.frame(table(DT$CNTRY)) # Creates a data frame with columns Var1 Freq
+	# Using plyr package ddply function. Split the data frame 'DT' by column 'CNTRY' and applying funtion nrow, returning data frame
+	#apply functions are packages made instead of for loops				       
+	> ddply(DT,.(CNTRY), nrow) 
+	#aggregate is the core R function
+	> aggregate(cbind(count=PROD)~CNTRY, data = DT, FUN = function(x){NROW(x)})
+	
+					       
+	#===================================END OF ECOLAB===================================================================				       
+
+	# ===============Merging Data
+	> fileurl1 = "https://dl.dropboxusercontent.com/u/7710864/data/reviews-apr29.csv"
+	> fileurl2 = "https://dl.dropboxusercontent.com/u/7710864/data/solutions-apr29.csv"
+	> download.file(fileurl1, destfile = "reviews.csv")	
+	> download.file(fileurl2, destfile = "solutions.csv")
+	
+	> reviews <- read.csv("reviews.csv"); solutions <- read.csv("solutions.csv")
+	#merge function is kind of FULL OUTER JOIN. all= TURE will keep column value as NA , if no match found
+	> mergedata1 <- merge(reviews, solutions, by.x="solution_id", by.y = "id",all = TRUE)	
+	
+	> intersect(names(solutions), names(reviews))
+	[1] "id"        "start"     "stop"      "time_left"
+	> mergedata2 <- merge(reviews, solutions, all = TRUE)
+	> head(mergedata2)				    
+		
+	#Using Join Command				       
+	> df3 = data.frame(id=sample(1:10), z= rnorm(10))
+	> df2 = data.frame(id=sample(1:10), y= rnorm(10))
+	> df1 = data.frame(id=sample(1:10), x= rnorm(10))
+	> arrange(join(df1,df2),id)				       
+	> dfList <- list(df1, df2, df3)
+	> join_all(dfList)				       
 }
