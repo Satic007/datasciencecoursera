@@ -375,4 +375,48 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	4     A 174
 	5     A 174
 	6     A 174				       
+				       
+	#==================Using deplyr Package============
+	chicago <- readRDS("chicago.rds")
+	dim(chicago)
+	str(chicago)
+	names(chicago)
+	
+	install.packages("dplyr")	
+	library(dplyr)				       
+	head(select(chicago, city:dptp))				       
+	head(select(chicago, -(city:dptp)))
+	
+	#Filtering the records				       
+	chic.f <- filter(chicago, pm25tmean2>30)
+	head(chic.f, 2)
+	chic.f <- filter(chicago, pm25tmean2>30 & tmpd >80)
+	chicago <- arrange(chicago, date)
+	head(chicago)
+	tail(chicago)
+	
+	#Arranging the data				       
+	chicago <- arrange(chicago, desc(date))
+				       
+	#Renaming the columns
+	chicago <- rename(chicago, pm25 = pm25tmean2, dewpoint = dptp)
+	head(chicago)
+				       
+	#Adding new columns			       
+	chicago <- mutate(chicago, pm25detrend = pm25 - mean(pm25, na.rm = true))
+	chicago <- mutate(chicago, pm25detrend = pm25 - mean(pm25, na.rm = TRUE))
+	head(select(chicago, pm25,pm25detrend))
+	
+        chicago <- mutate(chicago, tempcat = factor(1 * (tmpd >80), labels = c("cold","hot")))
+	select(chicago, tempcat="hot")
+	head(filter(chicago, tempcat == "hot"))				       
+	hotcold <- group_by(chicago, tempcat)
+				       
+	#Summarizing the data				       
+	summarise(hotcold, pm25= mean(pm25), o3=max(o3tmean2), no2=median(no2tmean2))
+	summarise(hotcold, pm25= mean(pm25, na.rm = TRUE), o3=max(o3tmean2), no2=median(no2tmean2))
+				       
+	chicago <- mutate(chicago, year=as.POSIXlt(date)$year + 1900)
+	years <- group_by(chicago, year)
+	summarise(years, pm25= mean(pm25, na.rm = TRUE), o3=max(o3tmean2), no2=median(no2tmean2))				       
 }
