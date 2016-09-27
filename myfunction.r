@@ -263,7 +263,7 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> colSums(is.na(restData)) # Searches all the columns in df for NA and summarizes each column
 	> all(colSums(is.na(restData))==0) # Applying the above in a condition, returns TRUE or FALSE
 	
-	> table(restData$zipCode==21212) # Finding number of records with specific condition
+	> table(restData$zipCode==21212) # Gives counts of records for a column with specific condition
 	> table(restData$zipCode %in% c("21212")) # Using IN operator
 	> table(restData$zipCode %in% c("21212","21213")) # multiple condition
 	FALSE  TRUE 
@@ -293,6 +293,86 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> print(object.size(fake), units = "Mb")
 	0.8 Mb
 	
+	#======================New variable creation=============================================
+	# creating sequences
+	> s1 <- seq(1,10, by=3) # mention min and max and by for amt of skip
+	> s2 <- seq(1,10, length=3) # mention the length of the vector
+	> x <- c(1,2,3,5,85); seq(along=x) # creating sequence based on the vector values
 	
+	#creating new variable
+	> restData$Nearme <- restData$neighborhood %in% c("Roland Park","Homeland")
+	> table(restData$Nearme)
+	
+	
+	# creatinga binary variable for same above condition
+	> restData$zipWrong <- ifelse(restData$zipCode<0, TRUE, FALSE)
+	> table(restData$zipWrong, restData$zipCode<0)
 
+		FALSE TRUE
+	  FALSE  1326    0
+	  TRUE      0    1
+	
+	# Creating categorical variables
+	> restData$zipGroups = cut(restData$zipCode, breaks = quantile(restData$zipCode))
+	> table(restData$zipGroups)
+
+	(-2.123e+04,2.12e+04]  (2.12e+04,2.122e+04] (2.122e+04,2.123e+04] (2.123e+04,2.129e+04] 
+			  337                   375                   282                   332 
+
+	> table(restData$zipGroups, restData$zipCode)	
+	#The same thing can be achieved using Hmisc package
+	> library(Hmisc)
+	> restData$zipGroups = cut2(restData$zipCode, g=4)
+	> table(restData$zipGroups)
+
+	[-21226,21205) [ 21205,21220) [ 21220,21227) [ 21227,21287] 
+		   338            375            300            314 		
+	
+	#===================== Reshaping the data=============
+	# Melting data frames
+	> library(reshape2)
+	#Melt function will create new data frame with ids with measurent varialbe. Out 32 records mtchars, the new data frame 
+	# will have 64 records 32 with mpg and 32 with hp 				       
+	> carMelt <- melt(mtcars, id=c("carname","gear","cyl"), measure.vars = c("mpg","hp"))
+	> head(carMelt)
+	> tail(carMelt)
+	
+	# dcast function to recast the data in particular data set
+	> cylData <- dcast(carMelt, cyl ~ variable)
+	> cylData # Dsiplays number of records for each cylinder type
+	  cyl mpg hp
+	1   4  11 11
+	2   6   7  7
+	3   8  14 14				       
+			  
+	> cylData <- dcast(carMelt, cyl ~ variable, mean) # Returns mean value
+	> cylData
+	  cyl      mpg        hp
+	1   4 26.66364  82.63636
+	2   6 19.74286 122.28571
+	3   8 15.10000 209.21429
+	
+	
+	
+	# Summing up
+	> spIns <- split(InsectSprays$count, InsectSprays$spray)
+	> sprcount <- lapply(spIns, sum)
+	> unlist(sprcount)				       
+	
+	#Another way using plyr package				       
+	> ddply(InsectSprays,.(spray), plyr::summarize, sum=sum(count))
+	#If multiple packages have same funtion, explicitly  mentione the function name of the package viz.., plyr::summarize				       
+	
+	#Another usage of ddply function				       
+	> spraySums <- ddply(InsectSprays,.(spray), plyr::summarize, sum=ave(count,FUN=sum))
+	> dim(spraySums)
+	[1] 72  2
+	> head(spraySums)
+	  spray sum
+	1     A 174
+	2     A 174
+	3     A 174
+	4     A 174
+	5     A 174
+	6     A 174				       
 }
