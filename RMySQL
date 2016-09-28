@@ -11,3 +11,4 @@ copy libmysql.dll to C:\Program Files\R\R-2.12.1\bin (Ooptional)
 run install.packages('RMySQL',type='source') and wait while compilation will end.
 check by running libraty(RMySQL)
 
+# http://www.biofrank.com/blog/
