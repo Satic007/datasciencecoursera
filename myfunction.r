@@ -484,12 +484,16 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> gdp_cntry[,"Ranking"] <- as.numeric(as.character(gdp_cntry[,"Ranking"]))				       
 	> gdp_cntry_mtch <- filter(gdp_cntry, Ranking > 0)
 	> gdp_cntry_mtch <- arrange(gdp_cntry_mtch, desc(Ranking))
+	> arrange(gdp_cntry_mtch,desc(Ranking))[13,"Economy"]	# Getting 13th records of descending order			       
 		## Alternate, using fread to read large data
 	> gdp <- fread("GDP.csv", skip = 4, nrows = 190, select = c(1, 2, 4, 5), col.names = c("CountryCode", "Rank", "Economy", "Total"))				       
 
+	> view(gdp) # will show the data in a view				       
+				       
 	#4
 	> ddply(gdp_cntry_mtch_inc, . (inc_grp), plyr::summarize, mean= mean(Ranking))				       
-				       
+	# Getting mean of all Income groups
+	> tapply(gdp_cntry_mtch$Ranking, gdp_cntry_mtch$Income.Group, mean)				       
 	#5
 	#cut() function divides a numeric vector into different ranges. 				       
 	> gdp_cntry_mtch$gdp_rnks2 <- cut(gdp_cntry_mtch$Ranking, breaks=5)
