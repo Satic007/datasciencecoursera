@@ -471,8 +471,15 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> gdp_cntry <- merge(gdp, cntry1, by.x = "cntry", by.y = "CountryCode", all = FALSE)				       
 	> gdp_cntry[,"Ranking"] <- as.numeric(as.character(gdp_cntry[,"Ranking"]))				       
 	> gdp_cntry_mtch <- filter(gdp_cntry, Ranking > 0)
-	> gdp_cntry_mtch <- arrange(gdp_cntry_mtch, desc(Ranking))				       
+	> gdp_cntry_mtch <- arrange(gdp_cntry_mtch, desc(Ranking))
+		## Alternate, using fread to read large data
+	> gdp <- fread("GDP.csv", skip = 4, nrows = 190, select = c(1, 2, 4, 5), col.names = c("CountryCode", "Rank", "Economy", "Total"))				       
 
 	#4
 	> ddply(gdp_cntry_mtch_inc, . (inc_grp), plyr::summarize, mean= mean(Ranking))				       
+				       
+	#5
+	#cut() function divides a numeric vector into different ranges. 				       
+	> gdp_cntry_mtch$gdp_rnks2 <- cut(gdp_cntry_mtch$Ranking, breaks=5)
+	> table(gdp_cntry_mtch$gdp_rnks2, gdp_cntry_mtch$`Income.Group`) # making a table versus Income Group				       
 }
