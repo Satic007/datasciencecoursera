@@ -458,4 +458,21 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> arrange(join(df1,df2),id)				       
 	> dfList <- list(df1, df2, df3)
 	> join_all(dfList)				       
+				       
+	# Quiz
+				       
+	#1
+	> id_hs$SALE <- ifelse(id_hs$ACR==3 & id_hs$AGS==6, TRUE, FALSE)	
+	> which(id_hs$SALE)				       
+	#3			       
+	> gdp <- read.csv("GDP_Data.csv", skip = 3, blank.lines.skip = TRUE)
+	> gdp <- gdp[gdp, c(1,2,4)]				       
+	> gdp <- rename(gdp, CNTRY=X)
+	> gdp_cntry <- merge(gdp, cntry1, by.x = "cntry", by.y = "CountryCode", all = FALSE)				       
+	> gdp_cntry[,"Ranking"] <- as.numeric(as.character(gdp_cntry[,"Ranking"]))				       
+	> gdp_cntry_mtch <- filter(gdp_cntry, Ranking > 0)
+	> gdp_cntry_mtch <- arrange(gdp_cntry_mtch, desc(Ranking))				       
+
+	#4
+	> ddply(gdp_cntry_mtch_inc, . (inc_grp), plyr::summarize, mean= mean(Ranking))				       
 }
