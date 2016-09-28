@@ -111,6 +111,18 @@ Cleaning <- function() {
   affmiss <- fetch(qry);quantile(affmiss$misMatches)
   affyMissSmall <- fetch(qry, n=10); dbClearResult(qry) # Always clear the result 
   
+  #========================Connecting SQL Server
+	install.packages("RODBC")
+	library(RODBC)
+	dbhandle <- odbcDriverConnect('driver={SQL Server};server=USEAGAN6469D;databas=G360_Landing;trusted_connection=true')
+	res <- sqlQuery(dbhandle, 'select top 10 * from information_schema.tables')
+	res <- sqlQuery(dbhandle, 'select top 10 Product_code from G360_Landing.dbo.G360_Product_Stg')
+	
+	#==== Using DSN
+	myconn <- odbcConnect("G360_Landing")
+	ftch <- sqlFetch(myconn,"G360_PRODUCT_STG") # data is fetched into a data frame
+  		
+	
   #=======================HDF5=================
   source("http://bioconductor.org/biocLite.R")
   biocLite("rhdf5") # 
