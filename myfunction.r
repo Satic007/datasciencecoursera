@@ -588,5 +588,17 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> p <- y[weekdays(y$sampleTimes)=="Monday" & format(y$sampleTimes,"%Y")=="2012",]
 	> length(p)
 	[1] 47				       
-				       
+
+	#Alternate to finding recordings
+	> yr2012 <- grepl("2012-*",sampleTimes)
+	> s2012 <- subset(sampleTimes,yr2012)
+	> day <- format(s2012,"%A")
+	> table(yr2012)
+	yr2012
+	FALSE  TRUE 
+	 2204   250 
+	> table(day)
+	day
+	   Friday    Monday  Thursday   Tuesday Wednesday 
+	       51        47        51        50        51 				       
 }
