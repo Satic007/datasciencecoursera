@@ -444,6 +444,8 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	> ddply(DT,.(CNTRY), nrow) 
 	#aggregate is the core R function
 	> aggregate(cbind(count=PROD)~CNTRY, data = DT, FUN = function(x){NROW(x)})
+	# Counting and aggregating
+	> count(DT,"CNTRY")	# Read about count			       
 	
 					       
 	#===================================END OF ECOLAB===================================================================				       
@@ -497,5 +499,94 @@ Response [http://httpbin.org/basic-auth/user/passwd]
 	#5
 	#cut() function divides a numeric vector into different ranges. 				       
 	> gdp_cntry_mtch$gdp_rnks2 <- cut(gdp_cntry_mtch$Ranking, breaks=5)
-	> table(gdp_cntry_mtch$gdp_rnks2, gdp_cntry_mtch$`Income.Group`) # making a table versus Income Group				       
+	> table(gdp_cntry_mtch$gdp_rnks2, gdp_cntry_mtch$`Income.Group`) # making a table versus Income Group	
+				       
+### ================================Week 4 == 
+	#======================Editing Text variable=======================================
+	> names(cameraData)
+	[1] "address"      "direction"    "street"       "crossStreet"  "intersection" "Location.1"  
+	> tolower(names(cameraData))
+	[1] "address"      "direction"    "street"       "crossstreet"  "intersection" "location.1"  	
+	> names(cameraData) <-tolower(names(cameraData))				       
+	> splitNames <- strsplit(names(cameraData),"\\.")
+	> splitNames[[6]]
+	[1] "Location" "1"				       
+	> firstElement <- function(x){x[1]}
+	> sapply(splitNames,firstElement)
+	[1] "address"      "direction"    "street"       "crossstreet"  "intersection" "location" 				       
+	> names(cameraData) <- sapply(splitNames,firstElement)
+	> names(cameraData)
+	[1] "address"      "direction"    "street"       "crossstreet"  "intersection" "location" 				       
+				       
+	> names(reviews)
+	[1] "id"          "solution_id" "reviewer_id" "start"       "stop"        "time_left"   "accept" 				       
+	
+	> sub("_","", names(reviews),) # substitutes the value
+	[1] "id"         "solutionid" "reviewerid" "start"      "stop"       "timeleft"   "accept"   				       
+				       
+	> tstNm <- "this_is_a_test"
+	> sub("_","", tstNm,)
+	[1] "thisis_a_test"
+	> gsub("_","", tstNm,)
+	[1] "thisisatest"
+	
+	> grep("Alameda", cameraData$intersection) #Find occurences 
+	[1]  4  5 36
+
+	> table(grep("Alameda",cameraData$intersection))
+	 4  5 36 
+	 1  1  1 
+	
+	> table(grepl("Alameda",cameraData$intersection)) #grepl --> TRUE and FALSE of occurances
+	FALSE  TRUE 
+	   77     3 			       
+	> grep("Alameda", cameraData$intersection, value = TRUE)
+	[1] "The Alameda  & 33rd St"   "E 33rd  & The Alameda"    "Harford \n & The Alameda"				       
+				       
+	> nm <- c("Jeffrey Leek")
+	> nchar(nm)
+	[1] 12			
+	> paste(substr(nm,1,7),"Stark")
+	[1] "Jeffrey Stark"
+	> paste0(substr(nm,1,7),"Stark")
+	[1] "JeffreyStark"
+	> paste(substr(nm,1,7),"Stark", sep = ".")
+	[1] "Jeffrey.Stark"
+	> str_trim("Jeff              ")
+	[1] "Jeff"				       
+#=========================WK4 Quiz
+	url = "http://d396qusza40orc.cloudfront.net/getdata%2Fdata%2Fss06hid.csv" #Removed https as issues with download method="curl"
+	> download.file(url, destfile = "hid.csv", method = "curl") # This is throwing error Status = 127
+	> download.file(url, destfile = "hid.csv")				       
+	> ls <- strsplit(names(hid), split = "wgtp")
+	> ls[123]				       
+	#Finding average of GDP
+	> gdp <- read.csv("GDP_Data.csv", skip = 4, blank.lines.skip = TRUE, na.strings = "NA")
+	> gdp <- gdp[,c(1,2,4,5)]
+	> names(gdp) <- c("CNTRY_CD","RANK","CNTRY_NM","GDP")				       
+	> gdp1 <- na.omit(gdp)
+	> gdp1$GDP <- gsub(",","", gdp1$GDP)
+	> gdp1[,"GDP"] <- as.numeric(as.character(gdp1$GDP))
+	> mean(gdp1$GDP)
+	[1] 377652.4		
+
+	> gdp_cntry <- merge(gdp1, cntry, by.x = "CNTRY_CD", by.y = "CountryCode")
+	#Finding number of records with Fiscal year end of June
+	> length(grep("Fiscal year end: June*", gdp_cntry$Special.Notes))
+	[1] 13				       
+				       
+	> install.packages("quantmod")
+	> library(quantmod)
+	> amzn <- getSymbols("AMZN", auto.assign = FALSE)
+	> sampleTimes = index(amzn)				       
+	> y <- data.frame(sampleTimes)
+	#Finding records in year 2012				       
+	> x <- y[format(y$sampleTimes,"%Y")=="2012",]
+	> length(x)
+	[1] 250		
+	#Finding recording in 2012 on Mondays
+	> p <- y[weekdays(y$sampleTimes)=="Monday" & format(y$sampleTimes,"%Y")=="2012",]
+	> length(p)
+	[1] 47				       
+				       
 }
